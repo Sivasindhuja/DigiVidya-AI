@@ -11,9 +11,9 @@ const useCourseData = () => {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const endpoint = userData?.role === 'educator'
-          ? '/api/course/getcreatorcourses'
-          : '/api/course/getpublishedcourses';
+        // For students, always fetch published courses
+        // For educators, this hook won't be the primary source (useCreatorCourseData is)
+        const endpoint = '/api/course/getpublishedcourses';
 
         const result = await axios.get(serverUrl + endpoint, { withCredentials: true });
         dispatch(setCourseData(result.data));
@@ -22,7 +22,9 @@ const useCourseData = () => {
       }
     };
 
-    fetchCourses();
+    if (userData) {
+      fetchCourses();
+    }
   }, [userData, dispatch]);
 };
 

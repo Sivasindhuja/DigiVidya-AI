@@ -15,6 +15,11 @@ export const createOrder = async (req, res) => {
     const course = await Course.findById(courseId);
     if (!course) return res.status(404).json({ message: "Course not found" });
 
+    // Check if course is free
+    if (!course.price || course.price === 0) {
+      return res.status(200).json({ isFree: true, courseId });
+    }
+
     const options = {
       amount: course.price * 100, // in paisa
       currency: 'INR',
@@ -22,7 +27,7 @@ export const createOrder = async (req, res) => {
     };
 
     const order = await razorpayInstance.orders.create(options);
-    return res.status(200).json(order);
+    return res.status(200).json({ ...order, isFree: false });
   } catch (err) {
     console.log(err)
     return res.status(500).json({ message: `Order creation failed ${err}` });

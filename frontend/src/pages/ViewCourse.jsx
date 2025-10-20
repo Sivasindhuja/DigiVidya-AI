@@ -138,6 +138,25 @@ const handleEnroll = async (courseId, userId) => {
     } , {withCredentials:true});
     console.log(orderData)
 
+    // Check if course is free
+    if (orderData.data.isFree) {
+      try {
+        const enrollRes = await axios.post(serverUrl + "/api/payment/enroll-free", {
+          courseId,
+          userId
+        }, { withCredentials: true });
+        
+        setIsEnrolled(true);
+        toast.success("Successfully enrolled in free course!");
+        // Refresh user data to update enrolledCourses
+        window.location.reload();
+      } catch (enrollError) {
+        toast.error(enrollError.response?.data?.message || "Failed to enroll in course");
+        console.error("Free Enrollment Error:", enrollError);
+      }
+      return;
+    }
+
     const options = {
       key: import.meta.env.VITE_RAZORPAY_KEY_ID, // from .env
       amount: orderData.data.amount,
@@ -156,6 +175,8 @@ const handleEnroll = async (courseId, userId) => {
     
 setIsEnrolled(true)
     toast.success(verifyRes.data.message);
+    // Refresh user data
+    window.location.reload();
   } catch (verifyError) {
     toast.error("Payment verification failed.");
     console.error("Verification Error:", verifyError);
@@ -204,8 +225,14 @@ setIsEnrolled(true)
                 ⭐ {avgRating} <span className="text-gray-500">(1,200 reviews)</span>
               </div>
               <div>
-                <span className="text-lg font-semibold text-black">{selectedCourseData?.price}</span>{" "}
-                <span className="line-through text-sm text-gray-400">₹599</span>
+                {selectedCourseData?.price && selectedCourseData.price > 0 ? (
+                  <>
+                    <span className="text-lg font-semibold text-black">₹{selectedCourseData.price}</span>{" "}
+                    <span className="line-through text-sm text-gray-400">₹{Math.round(selectedCourseData.price * 1.5)}</span>
+                  </>
+                ) : (
+                  <span className="text-lg font-semibold text-green-600">Free</span>
+                )}
               </div>
             </div>
 

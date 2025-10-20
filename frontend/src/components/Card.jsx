@@ -36,7 +36,9 @@ console.log("Average Rating:", avgRating);
         {/* Meta info */}
         <div className="flex justify-between text-sm text-gray-600 mt-3 px-[10px]">
           
-          <span className="font-semibold text-gray-800">₹{price}</span>
+          <span className="font-semibold text-gray-800">
+            {price && price > 0 ? `₹${price}` : <span className="text-green-600">Free</span>}
+          </span>
          
            <span className="flex items-center gap-1 ">
             <FaStar className="text-yellow-500" /> {avgRating}
