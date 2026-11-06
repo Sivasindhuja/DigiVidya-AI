@@ -1,202 +1,137 @@
-# 🚀 Quick Start Guide - DigiVidya LMS
+# Local Setup Guide
+
+This guide describes how to configure the DigiVidya LMS frontend and backend for local development.
+
+**Note:** These instructions have been prepared from the repository configuration and source code. The application has not been run or tested as part of this documentation cleanup.
 
 ## Prerequisites
-- Node.js (v16 or higher)
-- MongoDB (local or Atlas connection string)
-- npm or yarn
 
----
+- Node.js and npm
+- MongoDB connection
+- Git
+- Credentials for the external services used by the features you intend to configure
 
-## 🔧 Setup Instructions
+The frontend uses Vite 6, so use a Node.js version supported by that Vite release.
 
-### 1. Backend Setup
+## 1. Clone the repository
+
+```bash
+git clone https://github.com/Sivasindhuja/DigiVidya-AI.git
+cd DigiVidya-AI
+```
+
+## 2. Configure the backend
+
+Navigate to the backend directory:
 
 ```bash
 cd backend
 npm install
 ```
 
-Create a `.env` file in the `backend` folder with the following:
+Create a `.env` file in the `backend/` directory.
+
+The following environment variable names are referenced in the backend source:
 
 ```env
 PORT=8000
-MONGO_URI=your_mongodb_connection_string
-JWT_SECRET=your_secret_key_here
+
+MONGODB_URL=your_mongodb_connection_string
+JWT_SECRET=your_jwt_secret
+
+CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
+CLOUDINARY_API_KEY=your_cloudinary_api_key
+CLOUDINARY_API_SECRET=your_cloudinary_api_secret
+
 RAZORPAY_KEY_ID=your_razorpay_key_id
 RAZORPAY_SECRET=your_razorpay_secret
-CLOUDINARY_CLOUD_NAME=your_cloudinary_name
-CLOUDINARY_API_KEY=your_cloudinary_api_key
-CLOUDINARY_API_SECRET=your_cloudinary_secret
-MAIL_HOST=smtp.gmail.com
-MAIL_USER=your_email@gmail.com
-MAIL_PASS=your_email_app_password
+
+EMAIL=your_email_address
+EMAIL_PASS=your_email_app_password
 ```
 
-### 2. Frontend Setup
+Replace the example values with your own credentials. Do not commit the `.env` file.
+
+Start the backend:
+
+```bash
+npm run dev
+```
+
+The backend uses port `8000` by default.
+
+## 3. Configure the frontend
+
+Open another terminal and navigate to the frontend directory:
 
 ```bash
 cd frontend
 npm install
 ```
 
-Create a `.env` file in the `frontend` folder with:
+Create a `.env` file inside `frontend/`:
 
 ```env
 VITE_RAZORPAY_KEY_ID=your_razorpay_key_id
+VITE_FIREBASE_APIKEY=your_firebase_api_key
 ```
 
----
+The Firebase configuration also contains project-specific settings in the frontend source.
 
-## ▶️ Running the Application
-
-### Option 1: Using the Startup Script (Recommended)
-
-From the root directory:
+Start the frontend:
 
 ```bash
-./start-dev.sh
-```
-
-This will start both backend and frontend servers simultaneously.
-
-### Option 2: Manual Start
-
-**Terminal 1 - Backend:**
-```bash
-cd backend
 npm run dev
 ```
-Backend will run on: http://localhost:8000
 
-**Terminal 2 - Frontend:**
+Vite normally serves the frontend at:
+
+```text
+http://localhost:5173
+```
+
+## 4. Development commands
+
+### Backend
+
 ```bash
-cd frontend
 npm run dev
-```
-Frontend will run on: http://localhost:5173
-
----
-
-## 🧪 Testing the Bug Fixes
-
-### Test 1: Course Visibility
-
-1. **As Educator:**
-   - Login/Signup as educator
-   - Create a new course (navigate to `/createcourses`)
-   - Fill in the course details (title and category are required)
-   - Click "Create Course"
-   - You'll be redirected to `/addcourses/:courseId`
-   - Fill in additional details (subtitle, description, price, level, thumbnail)
-   - **Important:** Click "Click to Publish" button to publish the course
-   - Click "Save" to save changes
-
-2. **As Student:**
-   - Login/Signup as student
-   - Navigate to `/allcourses`
-   - ✅ **Verify:** The published course should now be visible
-   - ❌ **Verify:** Unpublished courses should NOT appear
-
-### Test 2: Enrollment Functionality
-
-1. **Test Free Course Enrollment:**
-   - As educator, create a course with **price = 0** or leave price empty
-   - Publish the course
-   - As student, visit `/allcourses`
-   - Click on the free course
-   - ✅ **Verify:** Price shows as "Free" in green
-   - Click "Enroll Now"
-   - ✅ **Verify:** Instant enrollment without payment
-   - ✅ **Verify:** Button changes to "Watch Now"
-
-2. **Test Paid Course Enrollment:**
-   - As educator, create a course with **price > 0** (e.g., ₹499)
-   - Publish the course
-   - As student, click on the paid course
-   - ✅ **Verify:** Price shows as "₹499"
-   - Click "Enroll Now"
-   - ✅ **Verify:** Razorpay payment gateway opens
-   - Complete payment (or use test mode)
-   - ✅ **Verify:** After successful payment, enrollment is confirmed
-   - ✅ **Verify:** Button changes to "Watch Now"
-
----
-
-## 📋 Key Features Fixed
-
-✅ **Course Visibility:** Published courses appear in student view  
-✅ **Free Enrollment:** Instant enrollment for free courses  
-✅ **Paid Enrollment:** Razorpay integration for paid courses  
-✅ **UI Improvements:** Proper display of "Free" vs "₹Price"  
-✅ **All Routes Connected:** Complete working application
-
----
-
-## 🐛 Common Issues & Solutions
-
-### Issue: MongoDB Connection Error
-**Solution:** Make sure your MongoDB is running or your connection string in `.env` is correct.
-
-### Issue: CORS Error
-**Solution:** Backend CORS is configured for `http://localhost:5173` and `http://localhost:5174`. Make sure frontend is running on one of these ports.
-
-### Issue: Razorpay Not Working
-**Solution:** 
-1. Make sure `VITE_RAZORPAY_KEY_ID` is set in frontend `.env`
-2. Make sure Razorpay script is loaded in `index.html`
-3. For testing, you can use Razorpay test mode keys
-
-### Issue: Free Courses Not Enrolling
-**Solution:** 
-1. Verify the course price is set to `0` or left empty
-2. Check browser console for errors
-3. Verify the `/api/payment/enroll-free` route is accessible
-
----
-
-## 📁 Project Structure
-
-```
-/workspace
-├── backend/
-│   ├── controllers/
-│   │   ├── courseController.js
-│   │   ├── orderController.js (MODIFIED)
-│   │   └── enrollmentController.js (NEW)
-│   ├── routes/
-│   │   └── paymentRoute.js (MODIFIED)
-│   └── index.js
-├── frontend/
-│   ├── src/
-│   │   ├── customHooks/
-│   │   │   └── useCourseData.js (MODIFIED)
-│   │   ├── pages/
-│   │   │   └── ViewCourse.jsx (MODIFIED)
-│   │   └── components/
-│   │       └── Card.jsx (MODIFIED)
-│   └── vite.config.js
-├── FIXES_APPLIED.md (Detailed fix documentation)
-├── QUICK_START.md (This file)
-└── start-dev.sh (Startup script)
+npm start
 ```
 
----
+### Frontend
 
-## 🎯 Next Steps
+```bash
+npm run dev
+npm run build
+npm run lint
+npm run preview
+```
 
-After verifying everything works:
-1. Configure your production MongoDB
-2. Set up Cloudinary for image/video uploads
-3. Configure email service for password reset
-4. Deploy to production (Render, Vercel, etc.)
+Run these commands from the corresponding `backend/` or `frontend/` directory.
 
----
+## 5. Optional startup script
 
-## 📞 Support
+The repository includes `start-dev.sh`, a Bash script intended to start both development servers. It also installs dependencies if their `node_modules` directories are missing.
 
-For issues or questions, refer to:
-- `FIXES_APPLIED.md` for detailed technical documentation
-- Backend API documentation (if available)
-- Original README.md for team info
+It is intended for Bash-compatible environments and is not a cross-platform Windows startup command.
 
-Happy Learning! 🎓
+## External services
+
+Depending on the functionality being used, the application integrates with:
+
+- MongoDB for application data
+- Firebase Authentication for Google sign-in
+- Google Gemini for AI-assisted course search
+- Cloudinary for uploaded media
+- Razorpay for payment processing
+- Nodemailer-compatible email delivery for OTP messages
+
+Configure the required credentials before using the corresponding functionality.
+
+## Important Notes
+
+- Never commit `.env` files or private API credentials.
+- The frontend and backend have separate dependency manifests.
+- The previous hosted deployment is currently unavailable.
+- This guide documents configuration names found in the source; it does not guarantee that every external integration is currently operational.
